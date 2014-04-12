@@ -86,6 +86,7 @@ r  ==>replace,     q==>quit.
 C-g==>exit and restore."
   "Menu for command `rectangle-menu'.")
 
+;;;###autoload
 (defun rectangle-menu (beg end)
   (interactive "r")
   (if (and transient-mark-mode (region-active-p))
@@ -121,6 +122,7 @@ C-g==>exit and restore."
         (message nil))
       (message "No region, activate region please!")))
 
+;;;###autoload
 (defun rectangle-insert-at-right (beg end arg)
   "Create a new rectangle based on longest line of region\
 and insert string at right of it.
@@ -154,6 +156,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
                nil 'string-rectangle-history def-val))
     (insert str)))
 
+;;;###autoload
 (defun copy-rectangle (beg end)
   "Well, copy rectangle, not kill."
   (interactive "r")
