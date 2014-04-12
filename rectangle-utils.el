@@ -5,6 +5,7 @@
 ;; X-URL: https://github.com/thierryvolpiatto/rectangle-utils
 
 ;; Compatibility: GNU Emacs 24.1+
+;; Package-Requires: ((emacs "24"))
 
 ;; This file is not part of GNU Emacs.
 
