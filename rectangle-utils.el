@@ -1,12 +1,10 @@
 ;;; rectangle-utils.el --- Some useful rectangle functions.
 
-;	$Id: rectangle-utils.el,v 1.11 2010/02/17 10:30:05 thierry Exp $
+;; Author: Thierry Volpiatto <thierry.volpiatto@gmail.com>
+;; Copyright (C) 2010~2014 Thierry Volpiatto, all rights reserved.
+;; X-URL: https://github.com/thierryvolpiatto/rectangle-utils
 
-;; Author: Thierry Volpiatto
-
-;; Copyright (C) 2010 Thierry Volpiatto, all rights reserved.
-
-;; Compatibility: GNU Emacs 23.1.92.1
+;; Compatibility: GNU Emacs 24.1+
 
 ;; This file is not part of GNU Emacs.
 
@@ -28,6 +26,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun goto-longest-region-line (beg end)
   "Find the longest line in region and go to it."
   (let* ((real-end  (save-excursion (goto-char end) (end-of-line) (point)))
@@ -36,12 +36,12 @@
          (longest   0)
          (count     0)
          nth-longest-line)
-    (loop for i in line-list
-         do (progn
-              (when (> (length i) longest)
-                (setq longest (length i))
-                (setq nth-longest-line count))
-              (incf count)))
+    (cl-loop for i in line-list
+          do (progn
+               (when (> (length i) longest)
+                 (setq longest (length i))
+                 (setq nth-longest-line count))
+               (incf count)))
     (goto-char beg)
     (forward-line nth-longest-line)))
 
@@ -92,7 +92,7 @@ C-g==>exit and restore."
       (unwind-protect
            (while (let ((input (read-key (propertize rectangle-menu
                                           'face 'minibuffer-prompt))))
-                    (case input
+                    (cl-case input
                       (?i
                        (let* ((def-val (car string-rectangle-history))
                               (string  (read-string (format "String insert rectangle (Default %s): " def-val)
