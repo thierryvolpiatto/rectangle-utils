@@ -5,7 +5,7 @@
 ;; X-URL: https://github.com/thierryvolpiatto/rectangle-utils
 
 ;; Compatibility: GNU Emacs 24.1+
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'rect)
 
 (defun goto-longest-region-line (beg end)
   "Find the longest line in region and go to it."
@@ -42,7 +43,7 @@
                (when (> (length i) longest)
                  (setq longest (length i))
                  (setq nth-longest-line count))
-               (incf count)))
+               (cl-incf count)))
     (goto-char beg)
     (forward-line nth-longest-line)))
 
