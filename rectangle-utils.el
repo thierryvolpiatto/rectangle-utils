@@ -47,6 +47,7 @@
     (goto-char beg)
     (forward-line nth-longest-line)))
 
+;;;###autoload
 (defun extend-rectangle-to-end (beg end)
   "Create a rectangle based on the longest line of region."
   (interactive "r")
