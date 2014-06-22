@@ -143,6 +143,8 @@ With prefix arg, insert string at end of each lines (no rectangle)."
     (unless arg
       (extend-rectangle-to-end beg end)
       (setq end (region-end)))
+    ;; marked region is no more needed.
+    (deactivate-mark)
     (goto-char beg) (end-of-line)
     (unless arg (setq beg (point)))
     (while (< (point) end)
@@ -150,6 +152,8 @@ With prefix arg, insert string at end of each lines (no rectangle)."
         (setq str (read-string
                    (format "Insert string at end of rectangle (Default %s): " def-val)
                    nil 'string-rectangle-history def-val))
+        ;; Now reuse last used STR in next cycle.
+        (setq def-val str)
         (insert str)
         (forward-line 1)
         (end-of-line)
