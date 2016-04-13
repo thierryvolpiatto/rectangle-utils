@@ -52,7 +52,7 @@
   "Create a rectangle based on the longest line of region."
   (interactive "r")
   (let ((longest-len (save-excursion
-                       (goto-longest-region-line beg end)
+                       (rectangle-utils--goto-longest-region-line beg end)
                        (length (buffer-substring (point-at-bol) (point-at-eol)))))
         (inhibit-read-only t) ; ignore read-only status of the buffer
         column-beg column-end)
@@ -78,7 +78,7 @@
       (error "Error: not in a rectangular region."))))
 
 
-(defvar rectangle-utils-menu
+(defvar rectangle-utils-menu-string
   "Rectangle Menu:
 ==============
 i  ==>insert,      a==>insert at right.
@@ -88,14 +88,14 @@ e  ==>mark to end, y==>yank.
 M-w==>copy,        c==>clear.
 r  ==>replace,     q==>quit.
 C-g==>exit and restore."
-  "Menu for command `rectangle-menu'.")
+  "Menu for command `rectangle-utils-menu'.")
 
 ;;;###autoload
 (defun rectangle-utils-menu (beg end)
   (interactive "r")
   (if (and transient-mark-mode (region-active-p))
       (unwind-protect
-           (while (let ((input (read-key (propertize rectangle-menu
+           (while (let ((input (read-key (propertize rectangle-utils-menu-string
                                           'face 'minibuffer-prompt))))
                     (cl-case input
                       (?i
@@ -103,14 +103,14 @@ C-g==>exit and restore."
                               (string  (read-string (format "String insert rectangle (Default %s): " def-val)
                                                     nil 'string-rectangle-history def-val)))
                          (string-insert-rectangle beg end string) nil))
-                      (?a (rectangle-insert-at-right beg end nil) nil)
+                      (?a (rectangle-utils-insert-at-right beg end nil) nil)
                       (?k (kill-rectangle beg end) nil)
-                      (?\M-w (copy-rectangle beg end) nil)
+                      (?\M-w (rectangle-utils-copy-rectangle beg end) nil)
                       (?d (delete-rectangle beg end) nil)
                       (?o (open-rectangle beg end) nil)
                       (?c (clear-rectangle beg end) nil)
                       (?w (copy-rectangle-to-register (read-string "Register: ") beg end) nil)
-                      (?e (extend-rectangle-to-end beg end)
+                      (?e (rectangle-utils-extend-rectangle-to-end beg end)
                           (setq beg (region-beginning)
                                 end (region-end)) t)
                       (?\C-g (delete-trailing-whitespace)
@@ -142,7 +142,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
         (def-val (car string-rectangle-history))
         str)
     (unless arg
-      (extend-rectangle-to-end beg end)
+      (rectangle-utils-extend-rectangle-to-end beg end)
       (setq end (region-end)))
     ;; marked region is no more needed.
     (deactivate-mark)
