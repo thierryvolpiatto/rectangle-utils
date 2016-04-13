@@ -30,7 +30,7 @@
 (require 'cl-lib)
 (require 'rect)
 
-(defun goto-longest-region-line (beg end)
+(defun rectangle-utils--goto-longest-region-line (beg end)
   "Find the longest line in region and go to it."
   (let* ((real-end  (save-excursion (goto-char end) (end-of-line) (point)))
          (buf-str   (buffer-substring beg real-end))
@@ -48,7 +48,7 @@
     (forward-line nth-longest-line)))
 
 ;;;###autoload
-(defun extend-rectangle-to-end (beg end)
+(defun rectangle-utils-extend-rectangle-to-end (beg end)
   "Create a rectangle based on the longest line of region."
   (interactive "r")
   (let ((longest-len (save-excursion
@@ -77,7 +77,7 @@
         (error "Error: not in a rectangular region."))))
 
 
-(defvar rectangle-menu
+(defvar rectangle-utils-menu
   "Rectangle Menu:
 ==============
 i  ==>insert,      a==>insert at right.
@@ -90,7 +90,7 @@ C-g==>exit and restore."
   "Menu for command `rectangle-menu'.")
 
 ;;;###autoload
-(defun rectangle-menu (beg end)
+(defun rectangle-utils-menu (beg end)
   (interactive "r")
   (if (and transient-mark-mode (region-active-p))
       (unwind-protect
@@ -126,7 +126,7 @@ C-g==>exit and restore."
       (message "No region, activate region please!")))
 
 ;;;###autoload
-(defun rectangle-insert-at-right (beg end arg)
+(defun rectangle-utils-insert-at-right (beg end arg)
   "Create a new rectangle based on longest line of region\
 and insert string at right of it.
 With prefix arg, insert string at end of each lines (no rectangle)."
@@ -164,7 +164,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
     (insert str)))
 
 ;;;###autoload
-(defun copy-rectangle (beg end)
+(defun rectangle-utils-copy-rectangle (beg end)
   "Well, copy rectangle, not kill."
   (interactive "r")
   (setq killed-rectangle (extract-rectangle beg end))
