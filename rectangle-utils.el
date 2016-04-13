@@ -54,6 +54,7 @@
   (let ((longest-len (save-excursion
                        (goto-longest-region-line beg end)
                        (length (buffer-substring (point-at-bol) (point-at-eol)))))
+        (inhibit-read-only t) ; ignore read-only status of the buffer
         column-beg column-end)
     (goto-char beg) (setq column-beg (current-column))
     (save-excursion (goto-char end) (setq column-end (current-column)))
@@ -73,8 +74,8 @@
           (goto-char beg)
           (push-mark end 'nomsg 'activate)
           (setq deactivate-mark  nil))
-        (deactivate-mark 'force)
-        (error "Error: not in a rectangular region."))))
+      (deactivate-mark 'force)
+      (error "Error: not in a rectangular region."))))
 
 
 (defvar rectangle-utils-menu
