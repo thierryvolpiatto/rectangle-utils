@@ -47,6 +47,44 @@
     (goto-char beg)
     (forward-line nth-longest-line)))
 
+(defvar rectangle-utils-extend-region-to-space-separator " ")
+(cl-defun rectangle-utils-num-char-to-space (&optional (space " "))
+  (let ((count 0))
+    (catch 'eol
+      (unless (looking-at " \\|\n\\|\t")
+        (save-excursion
+          (while (not (looking-at space))
+            (and (eolp) (throw 'eol count))
+            (forward-char 1)
+            (cl-incf count))))
+      count)))
+
+(defun rectangle-utils-longest-length-until-space-in-region (beg end)
+  (let ((num-lines (count-lines beg end))
+        longest)
+    (save-excursion
+      (goto-char (region-beginning))
+      (setq longest (rectangle-utils-num-char-to-space))
+      (let ((col (current-column)))
+        (cl-loop repeat (1- num-lines) do
+                 (progn
+                   (forward-line 1)
+                   (forward-char col)
+                   (pcase (rectangle-utils-num-char-to-space)
+                     ((and it (pred (< longest)))
+                      (setq longest it)))))))
+    longest))
+
+(defun rectangle-utils-count-spaces ()
+  (let ((count 0))
+    (catch 'eol
+      (save-excursion
+        (while (looking-at " ")
+          (and (eolp) (throw 'eol count))
+          (forward-char 1)
+          (cl-incf count))
+        count))))
+
 ;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-end (beg end)
   "Create a rectangle based on the longest line of region."
@@ -170,6 +208,49 @@ With prefix arg, insert string at end of each lines (no rectangle)."
   (interactive "r")
   (setq killed-rectangle (extract-rectangle beg end))
   (setq deactivate-mark t))
+
+(defun rectangle-utils-extend-rectangle-to-space (beg end)
+  (interactive "r")
+  (let ((lgst      (rectangle-utils-longest-length-until-space-in-region beg end))
+        (num-lines (count-lines beg end))
+        column-beg column-end)
+    (goto-char beg)
+    (setq column-beg (current-column))
+    (save-excursion
+      (goto-char end)
+      (setq column-end (current-column)))
+    (if (not (eq column-beg column-end))
+        (progn
+          (save-excursion
+            (cl-loop with col = (current-column)
+                  repeat num-lines do
+                  (progn
+                    (pcase (rectangle-utils-num-char-to-space
+                            rectangle-utils-extend-region-to-space-separator)
+                      ((and it (guard (> lgst it)))
+                       (forward-char it)
+                       (if (> (rectangle-utils-count-spaces) (- lgst it))
+                           (forward-char (- lgst it))
+                         (insert (make-string (- lgst it) ? )))
+                       (setq new-end (point)))
+                      ((pred zerop)
+                       (forward-whitespace 1)
+                       (if (>= (rectangle-utils-count-spaces) lgst)
+                           (forward-char lgst)
+                         (insert (make-string lgst ? )))
+                       (setq new-end (point)))
+                      (_ (forward-char lgst) (setq new-end (point))))
+                    (forward-line 1)
+                    (move-to-column col))))
+          (push-mark new-end 'nomsg 'activate)
+          (setq deactivate-mark nil))
+      (deactivate-mark 'force)
+      (error "Error: not in a rectangular region."))))
+
+(defun rectangle-utils-extend-rectangle-to-space-or-paren (beg end)
+  (interactive "r")
+  (let ((rectangle-utils-extend-region-to-space-separator " \\|("))
+    (rectangle-utils-extend-rectangle-to-space beg end)))
 
 (provide 'rectangle-utils)
 
