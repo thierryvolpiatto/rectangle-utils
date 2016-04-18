@@ -209,6 +209,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
   (setq killed-rectangle (extract-rectangle beg end))
   (setq deactivate-mark t))
 
+;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-space (beg end)
   (interactive "r")
   (let ((lgst      (rectangle-utils-longest-length-until-space-in-region beg end))
@@ -247,6 +248,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
       (deactivate-mark 'force)
       (error "Error: not in a rectangular region."))))
 
+;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-space-or-paren (beg end)
   (interactive "r")
   (let ((rectangle-utils-extend-region-to-space-separator " \\|("))
