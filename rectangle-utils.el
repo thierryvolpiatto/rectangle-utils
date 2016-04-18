@@ -213,7 +213,7 @@ With prefix arg, insert string at end of each lines (no rectangle)."
   (interactive "r")
   (let ((lgst      (rectangle-utils-longest-length-until-space-in-region beg end))
         (num-lines (count-lines beg end))
-        column-beg column-end)
+        column-beg column-end new-end)
     (goto-char beg)
     (setq column-beg (current-column))
     (save-excursion
