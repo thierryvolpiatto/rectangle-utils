@@ -259,6 +259,7 @@ Useful to realign let, setq etc..."
   (let ((rectangle-utils-extend-region-to-space-separator " \\|("))
     (rectangle-utils-extend-rectangle-to-space beg end)))
 
+;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-space-or-dot (beg end)
   "Allow creating a rectangular region up to space or dot.
 Useful to realign alists."
