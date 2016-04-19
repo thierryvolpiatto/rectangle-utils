@@ -48,6 +48,7 @@
     (forward-line nth-longest-line)))
 
 (defvar rectangle-utils-extend-region-to-space-separator " ")
+
 (cl-defun rectangle-utils-num-char-to-space (&optional (space " "))
   (let ((count 0))
     (catch 'eol
@@ -211,6 +212,8 @@ With prefix arg, insert string at end of each lines (no rectangle)."
 
 ;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-space (beg end)
+  "Allow creating a rectangular region up to space.
+The rectangle is extended indeed to `rectangle-utils-extend-region-to-space-separator'."
   (interactive "r")
   (let ((lgst      (rectangle-utils-longest-length-until-space-in-region beg end))
         (num-lines (count-lines beg end))
@@ -250,8 +253,17 @@ With prefix arg, insert string at end of each lines (no rectangle)."
 
 ;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-space-or-paren (beg end)
+  "Allow creating a rectangular region up to space or paren i.e \"(\".
+Useful to realign let, setq etc..."
   (interactive "r")
   (let ((rectangle-utils-extend-region-to-space-separator " \\|("))
+    (rectangle-utils-extend-rectangle-to-space beg end)))
+
+(defun rectangle-utils-extend-rectangle-to-space-or-dot (beg end)
+  "Allow creating a rectangular region up to space or dot.
+Useful to realign alists."
+  (interactive "r")
+  (let ((rectangle-utils-extend-region-to-space-separator " \\|[.]"))
     (rectangle-utils-extend-rectangle-to-space beg end)))
 
 (provide 'rectangle-utils)
