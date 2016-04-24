@@ -273,8 +273,7 @@ Useful to realign alists."
 
 ;;;###autoload
 (defun rectangle-utils-extend-rectangle-to-regexp (beg end)
-  "Allow creating a rectangular region up to space or dot.
-Useful to realign alists."
+  "Allow creating a rectangular region up to regexp."
   (interactive "r")
   (let ((rectangle-utils--extend-region-to-space-separator
          (read-regexp "Regexp: " " ")))
