@@ -114,7 +114,9 @@
           ;; Go back to BEG and push mark to new END.
           (goto-char beg)
           (push-mark end 'nomsg 'activate)
-          (setq deactivate-mark  nil))
+          (setq deactivate-mark  nil)
+          (when (fboundp 'rectangle-mark-mode)
+            (rectangle-mark-mode 1)))
       (deactivate-mark 'force)
       (error "Error: not in a rectangular region."))))
 
@@ -251,7 +253,9 @@ The rectangle is extended indeed to `rectangle-utils--extend-region-to-space-sep
                     (forward-line 1)
                     (move-to-column col))))
           (push-mark new-end 'nomsg 'activate)
-          (setq deactivate-mark nil))
+          (setq deactivate-mark nil)
+          (when (fboundp 'rectangle-mark-mode)
+            (rectangle-mark-mode 1)))
       (deactivate-mark 'force)
       (error "Error: not in a rectangular region."))))
 
