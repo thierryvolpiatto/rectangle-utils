@@ -48,6 +48,7 @@
     (forward-line nth-longest-line)))
 
 (defvar rectangle-utils--extend-region-to-space-separator " ")
+(defvar rectangle-utils-regexp-history nil)
 
 (cl-defun rectangle-utils-num-char-to-space (&optional (space " "))
   (let ((count 0))
@@ -280,7 +281,7 @@ Useful to realign alists."
   "Allow creating a rectangular region up to regexp."
   (interactive "r")
   (let ((rectangle-utils--extend-region-to-space-separator
-         (read-regexp "Regexp: " " ")))
+         (read-regexp "Regexp: " " " 'rectangle-utils-regexp-history)))
     (rectangle-utils-extend-rectangle-to-space beg end)))
 
 (provide 'rectangle-utils)
