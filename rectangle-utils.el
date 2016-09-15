@@ -157,7 +157,7 @@ C-g==>exit and restore."
                       (?e (rectangle-utils-extend-rectangle-to-end beg end)
                           (setq beg (region-beginning)
                                 end (region-end)) t)
-                      (?\C-g (delete-trailing-whitespace)
+                      (?\C-g (delete-trailing-whitespace beg end)
                              (goto-char beg) nil)
                       (?y (yank-rectangle) nil)
                       (?r
