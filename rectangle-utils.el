@@ -30,17 +30,31 @@
 (require 'cl-lib)
 (require 'rect)
 
+(defun rectangle-utils-collect-strings-in-region (beg end)
+  (save-restriction
+    (narrow-to-region (save-excursion (goto-char beg) (pos-bol)) end)
+    (let ((col-beg (save-excursion (goto-char beg) (current-column)))
+          (last-line-pos (save-excursion (goto-char end) (pos-bol)))
+          (strs '()))
+      (save-excursion
+        (goto-char beg)
+        (push (buffer-substring-no-properties (point) (pos-eol)) strs)
+        (while (not (eq (pos-bol) last-line-pos))
+          (forward-line 1) (move-to-column col-beg)
+          (push (buffer-substring-no-properties (point) (pos-eol)) strs)))
+      (nreverse strs))))
+
 (defun rectangle-utils--goto-longest-region-line (beg end)
   "Find the longest line in region and go to it."
   (let* ((real-end  (save-excursion (goto-char end) (end-of-line) (point)))
-         (buf-str   (buffer-substring beg real-end))
-         (line-list (split-string buf-str "\n"))
+         (line-list
+           (rectangle-utils-collect-strings-in-region beg end))
          (longest   0)
          (count     0)
          nth-longest-line)
     (cl-loop for i in line-list
           do (progn
-               (when (> (length i) longest)
+               (when (>= (length i) longest)
                  (setq longest (length i))
                  (setq nth-longest-line count))
                (cl-incf count)))
