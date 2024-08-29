@@ -149,14 +149,14 @@ and insert string at right of it.
 With prefix arg, insert string at end of each lines (no rectangle)."
   (interactive "r\nP")
   (let ((incstr (lambda (str)
-                  (if (and str (string-match "[0-9]+" str))
-                      (let ((rep (match-string 0 str)))
+                  (if (and str (string-match "\\\\#\\([0-9]+\\)" str))
+                      (let ((rep (match-string 1 str)))
                         (replace-match
                          (int-to-string (1+ (string-to-number rep)))
-                         nil t str))
-                      str)))
+                         nil t str 1))
+                    str)))
         (def-val (car string-rectangle-history))
-        str)
+        str newstr)
     (unless arg
       (rectangle-utils-extend-rectangle-to-end beg end)
       (setq end (region-end)))
@@ -164,21 +164,18 @@ With prefix arg, insert string at end of each lines (no rectangle)."
     (deactivate-mark)
     (goto-char beg) (end-of-line)
     (unless arg (setq beg (point)))
-    (while (< (point) end)
-      (let ((init (funcall incstr str)))
-        (setq str (read-string
-                   (format "Insert string at end of rectangle (Default %s): " def-val)
-                   nil 'string-rectangle-history def-val))
-        ;; Now reuse last used STR in next cycle.
-        (setq def-val str)
-        (insert str)
-        (forward-line 1)
-        (end-of-line)
-        (setq end (+ end (length str)))))
     (setq str (read-string
                (format "Insert string at end of rectangle (Default %s): " def-val)
                nil 'string-rectangle-history def-val))
-    (insert str)))
+    (while (< (point) end)
+      (when newstr (setq str (funcall incstr str)))
+      (setq newstr (replace-regexp-in-string "\\\\#" "" str))
+      (insert newstr)
+      (forward-line 1)
+      (end-of-line)
+      (setq end (+ end (length newstr)))
+      (when (= (point) end)
+        (insert (replace-regexp-in-string "\\\\#" "" (funcall incstr str)))))))
 
 ;;;###autoload
 (defun rectangle-utils-copy-rectangle (beg end)
