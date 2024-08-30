@@ -143,11 +143,20 @@ C-g==>exit and restore."
       (message "No region, activate region please!")))
 
 ;;;###autoload
-(defun rectangle-utils-insert-at-right (beg end arg)
-  "Create a new rectangle based on longest line of region\
-and insert string at right of it.
-With prefix arg, insert string at end of each lines (no rectangle)."
-  (interactive "r\nP")
+(defun rectangle-utils-insert-at-right (string beg end arg)
+  "Extend region from BEG to END to rectangle and insert a string at each eol.
+With prefix ARG, insert string at end of each lines (no rectangle).
+A number in the string added at end can be incremented if it is
+prefixed with \"\\#\"."
+  (interactive (list (let ((def-val (car-safe string-rectangle-history)))
+                       (read-string
+                        (format
+                         "Insert string at end of rectangle (Default %s): "
+                         def-val)
+                        nil 'string-rectangle-history def-val))
+                     (region-beginning)
+                     (region-end)
+                     current-prefix-arg))
   (let ((incstr (lambda (str)
                   (if (and str (string-match "\\\\#\\([0-9]+\\)" str))
                       (let ((rep (match-string 1 str)))
@@ -155,8 +164,8 @@ With prefix arg, insert string at end of each lines (no rectangle)."
                          (int-to-string (1+ (string-to-number rep)))
                          nil t str 1))
                     str)))
-        (def-val (car string-rectangle-history))
-        str newstr)
+        newstr)
+    (cl-assert (and beg end) nil "No region specified")
     (unless arg
       (rectangle-utils-extend-rectangle-to-end beg end)
       (setq end (region-end)))
@@ -164,18 +173,16 @@ With prefix arg, insert string at end of each lines (no rectangle)."
     (deactivate-mark)
     (goto-char beg) (end-of-line)
     (unless arg (setq beg (point)))
-    (setq str (read-string
-               (format "Insert string at end of rectangle (Default %s): " def-val)
-               nil 'string-rectangle-history def-val))
     (while (< (point) end)
-      (when newstr (setq str (funcall incstr str)))
-      (setq newstr (replace-regexp-in-string "\\\\#" "" str))
+      (when newstr (setq string (funcall incstr string)))
+      (setq newstr (replace-regexp-in-string "\\\\#" "" string))
       (insert newstr)
       (forward-line 1)
       (end-of-line)
       (setq end (+ end (length newstr)))
       (when (= (point) end)
-        (insert (replace-regexp-in-string "\\\\#" "" (funcall incstr str)))))))
+        (insert (replace-regexp-in-string
+                 "\\\\#" "" (funcall incstr string)))))))
 
 ;;;###autoload
 (defun rectangle-utils-copy-rectangle (beg end)
